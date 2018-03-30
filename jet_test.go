@@ -7,19 +7,34 @@ import (
 
 type TestCase struct {
 	Args []string
-	Res string
-	Err error
+	Expected string
+	ArgErr bool
+	RenderErr bool
 }
 
 func mockedArgs(t *testing.T, test TestCase) {
 	_Args := os.Args
 	os.Args = append([]string{"jetcli"}, test.Args...)
-	rendered, err := render(parseArgs())
-	if err != test.Err {
-		t.Errorf("Incorrect error for %v; Expected: %v but got %v", test.Args, test.Err, err)
+	tpl, dir, err := parseArgs()
+	if err != nil {
+		if !test.ArgErr {
+			// unexpected error
+			t.Errorf("Incorrect argument error for %v; Expected: %v but got %v", test.Args, test.ArgErr, err)
+		} else {
+			// expected error
+			return
+		}
 	}
-	if rendered != test.Res {
-		t.Errorf("Failed for %v; Expected: `%v` but got `%v`", test.Args, test.Res, rendered)
+	rendered, err := render(tpl, dir)
+	if err != nil {
+		if !test.RenderErr {
+			t.Errorf("Incorrect render error for %v; Expected: %v but got %v", test.Args, test.RenderErr, err)
+		} else {
+			return
+		}
+	}
+	if rendered != test.Expected {
+		t.Errorf("Failed for %v; Expected: `%v` but got `%v`", test.Args, test.Expected, rendered)
 	}
 	os.Args = _Args
 }
@@ -27,17 +42,32 @@ func mockedArgs(t *testing.T, test TestCase) {
 func TestBasic(t *testing.T) {
 	mockedArgs(t, TestCase{
 		Args: []string{"-directory", "testdata", "test.html"},
-		Res:  "title: hello from the jet CLI\nbody:  default body\n",
-		Err:  nil,
+		Expected: "title: hello from the jet CLI\nbody:  default body\n",
+		ArgErr: false,
+		RenderErr: false,
 	})
 	mockedArgs(t, TestCase{
 		Args: []string{"./testdata/test.html"},
-		Res:  "title: hello from the jet CLI\nbody:  default body\n",
-		Err:  nil,
+		Expected: "title: hello from the jet CLI\nbody:  default body\n",
+		ArgErr: false,
+		RenderErr: false,
 	})
 	mockedArgs(t, TestCase{
 		Args: []string{"./testdata/nonexistent"},
-		Res:  "",
-		Err:  nil,
+		Expected:  "",
+		ArgErr: false,
+		RenderErr: true,
+	})
+	mockedArgs(t, TestCase{
+		Args: []string{},
+		Expected:  "",
+		ArgErr: true,
+		RenderErr: false,
+	})
+	mockedArgs(t, TestCase{
+		Args: []string{"x", "y"},
+		Expected:  "",
+		ArgErr: true,
+		RenderErr: false,
 	})
 }
