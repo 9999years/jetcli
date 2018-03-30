@@ -10,21 +10,6 @@ import (
 	"github.com/CloudyKit/jet"
 )
 
-// exists returns whether the given file or directory exists or not
-// https://stackoverflow.com/a/10510783/5719760
-// returns true, nil if the file exists and false, nil if the file doesn't
-// exist and a non-nil error for other Stat errors like a permissions error
-func exists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
-	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return true, err
-}
-
 // render renders a template
 func render(directory string, templateName string) (string, error) {
 	view := jet.NewHTMLSet(directory)
@@ -42,15 +27,15 @@ func render(directory string, templateName string) (string, error) {
 
 func parseArgs() (string, string, error) {
 	set := flag.NewFlagSet("", flag.ContinueOnError)
+	const templateArg = "template"
 	set.Usage = func() {
-		argspec := "[options] TEMPLATE_NAME"
+		argspec := fmt.Sprintf("[options] [-%s] TEMPLATE_NAME", templateArg)
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s %s\n",
 			os.Args[0], argspec)
 		set.PrintDefaults()
 		println("NOTE: TEMPLATE_NAME can be given either as a named flag or positionally as the last argument")
 	}
 	directory := set.String("dir", "./", "The directory to search for templates in")
-	const templateArg = "template"
 	templateName := set.String(templateArg, "", "The filename of the template to render")
 	err := set.Parse(os.Args[1:])
 	if err != nil {
