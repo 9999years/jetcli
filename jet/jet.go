@@ -47,6 +47,7 @@ func parseArgs() (string, string, error) {
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s %s\n",
 			os.Args[0], argspec)
 		set.PrintDefaults()
+		println("NOTE: TEMPLATE_NAME can be given either as a named flag or positionally as the last argument")
 	}
 	directory := set.String("dir", "./", "The directory to search for templates in")
 	const templateArg = "template"
