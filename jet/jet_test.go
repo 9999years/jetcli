@@ -18,23 +18,28 @@ func testRender(t *testing.T, test RenderTestCase) {
 	os.Args = append([]string{"jet"}, test.Args...)
 	tpl, dir, err := parseArgs()
 	if err != nil {
-		if !test.ArgErr {
-			// unexpected error
-			t.Errorf("Incorrect argument error for %v; Expected no error but got %v",
-				test.ArgErr, err)
-		} else {
+		if test.ArgErr {
 			// expected error
 			return
+		} else {
+			// unexpected error
+			t.Errorf("Incorrect argument error for %v; Expected: %v but got %v",
+				test.Args, test.ArgErr, err)
 		}
+	} else if test.ArgErr {
+		t.Error("Argument error expected but not found!")
 	}
 	rendered, err := render(tpl, dir)
 	if err != nil {
-		if !test.RenderErr {
-			t.Errorf("Incorrect render error for %v; Expected no error but got %v",
-				test.RenderErr, err)
-		} else {
+		if test.RenderErr {
+			//expected
 			return
+		} else {
+			t.Errorf("Incorrect render error for %v; Expected: %v but got %v",
+				test.Args, test.RenderErr, err)
 		}
+	} else if test.RenderErr {
+		t.Error("Argument error expected but not found!")
 	}
 	if rendered != test.Expected {
 		t.Errorf("Failed for %v; Expected: `%v` but got `%v`",
@@ -47,31 +52,31 @@ func TestBasic(t *testing.T) {
 	testRender(t, RenderTestCase{
 		Args: []string{"-dir", "testdata", "test.html"},
 		Expected: "title: hello from the jet CLI\nbody:  default body\n",
-		ArgErr: false,
+		ArgErr:    false,
 		RenderErr: false,
 	})
 	testRender(t, RenderTestCase{
 		Args: []string{"./testdata/test.html"},
 		Expected: "title: hello from the jet CLI\nbody:  default body\n",
-		ArgErr: false,
+		ArgErr:    false,
 		RenderErr: false,
 	})
 	testRender(t, RenderTestCase{
 		Args: []string{"./testdata/nonexistent"},
 		Expected:  "",
-		ArgErr: false,
+		ArgErr:    false,
 		RenderErr: true,
 	})
 	testRender(t, RenderTestCase{
 		Args: []string{},
 		Expected:  "",
-		ArgErr: true,
+		ArgErr:    true,
 		RenderErr: false,
 	})
 	testRender(t, RenderTestCase{
 		Args: []string{"x", "y"},
 		Expected:  "",
-		ArgErr: true,
+		ArgErr:    true,
 		RenderErr: false,
 	})
 }
