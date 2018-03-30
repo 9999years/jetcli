@@ -50,14 +50,15 @@ func parseArgs() (string, string, error) {
 	}
 	directory := set.String("dir", "./", "The directory to search for templates in")
 	const templateArg = "template"
-	templateName := set.String(templateArg, "./", "The filename of the template to render")
+	templateName := set.String(templateArg, "", "The filename of the template to render")
 	err := set.Parse(os.Args[1:])
 	if err != nil {
 		return "", "", err
 	}
-	if set.Lookup(templateArg) == nil {
+	if set.Lookup(templateArg).Value.String() == "" {
+		// blank template
 		if set.NArg() != 1 {
-			return "", "", errors.New("One filename of a template to render required!")
+			return "", "", errors.New("Exactly one filename of a template to render required")
 		} else {
 			// template name given positionally
 			// hack to use string as *string

@@ -97,12 +97,12 @@ func testArgs(t *testing.T, test ArgTestCase) {
 		}
 	}
 	if dir != test.Directory {
-		t.Errorf("Incorrect directory: expected %s but got %s",
-			test.Directory, dir)
+		t.Errorf("Incorrect directory for %v: expected %s but got %s",
+			test.Args, test.Directory, dir)
 	}
 	if tpl != test.Template {
-		t.Errorf("Incorrect template: expected %s but got %s",
-			test.Template, tpl)
+		t.Errorf("Incorrect template for %v: expected %s but got %s",
+			test.Args, test.Template, tpl)
 	}
 	os.Args = _Args
 }
@@ -110,6 +110,12 @@ func testArgs(t *testing.T, test ArgTestCase) {
 func TestArgs(t *testing.T) {
 	testArgs(t, ArgTestCase{
 		Args: []string{"-dir", "testdata", "test.html"},
+		Template: "test.html",
+		Directory: "testdata",
+		Err: false,
+	})
+	testArgs(t, ArgTestCase{
+		Args: []string{"-dir", "testdata", "-template", "test.html"},
 		Template: "test.html",
 		Directory: "testdata",
 		Err: false,
