@@ -50,13 +50,13 @@ func testRender(t *testing.T, test RenderTestCase) {
 
 func TestBasic(t *testing.T) {
 	testRender(t, RenderTestCase{
-		Args: []string{"-dir", "testdata", "test.html"},
+		Args: []string{"-dir", "testdata", "test.txt"},
 		Expected: "title: hello from the jet CLI\nbody:  default body\n",
 		ArgErr:    false,
 		RenderErr: false,
 	})
 	testRender(t, RenderTestCase{
-		Args: []string{"./testdata/test.html"},
+		Args: []string{"./testdata/test.txt"},
 		Expected: "title: hello from the jet CLI\nbody:  default body\n",
 		ArgErr:    false,
 		RenderErr: false,
@@ -77,6 +77,12 @@ func TestBasic(t *testing.T) {
 		Args: []string{"x", "y"},
 		Expected:  "",
 		ArgErr:    true,
+		RenderErr: false,
+	})
+	testRender(t, RenderTestCase{
+		Args: []string{"testdata/test/parent.jet"},
+		Expected:  "this template contains: a child\n\n",
+		ArgErr:    false,
 		RenderErr: false,
 	})
 }
@@ -114,20 +120,20 @@ func testArgs(t *testing.T, test ArgTestCase) {
 
 func TestArgs(t *testing.T) {
 	testArgs(t, ArgTestCase{
-		Args: []string{"-dir", "testdata", "test.html"},
-		Template: "test.html",
+		Args: []string{"-dir", "testdata", "test.txt"},
+		Template: "test.txt",
 		Directory: "testdata",
 		Err: false,
 	})
 	testArgs(t, ArgTestCase{
-		Args: []string{"-dir", "testdata", "-template", "test.html"},
-		Template: "test.html",
+		Args: []string{"-dir", "testdata", "-template", "test.txt"},
+		Template: "test.txt",
 		Directory: "testdata",
 		Err: false,
 	})
 	testArgs(t, ArgTestCase{
-		Args: []string{"./testdata/test.html"},
-		Template: "./testdata/test.html",
+		Args: []string{"./testdata/test.txt"},
+		Template: "./testdata/test.txt",
 		Directory: "./",
 		Err: false,
 	})
